@@ -1,0 +1,51 @@
+.trek-control-panel-btn {
+	color:#000000;
+	background:#a0a0a0;
+	margin-top:2px;
+	border-color:#a0a0a0;
+}
+
+.trek-control-panel-btn:hover {
+	color:#ffffff;
+	background:#a0a0a0;
+	border-color:#ffffff;
+}
+
+.trek-control-panel-btn:focus {
+	color:#ffffff;
+	background:#a0a0a0;
+	border-color:#ffffff;
+}
+
+.trek-control-panel-btn:active {
+	color:#ffffff;
+	background:#000000;
+}
+
+.trek-control-panel-label {
+	background:#00009f;
+}
+
+.trek-control-panel {
+	background:#000000;
+	border:1px solid white;
+	border-color:#000000;
+}
+
+.trek-navbar {
+	background:#000000;
+}
+
+
+.trek-text {
+	font-size:large;
+}
+
+.trek-readout-text {
+	font-size:small;
+	color:#c0c0c0;
+}
+
+.trek-label {
+	color:#ffffff;
+}

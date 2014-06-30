@@ -1,0 +1,46 @@
+---
+# vagrant.yml
+- hosts: all
+  user: vagrant
+  sudo: True
+  tasks:
+  - name: Update APT package cache
+    apt: update_cache=yes
+
+  - name: Install packages
+    apt: pkg={{ item }} state=installed
+    with_items:
+      - bash-completion
+      - curl
+      - dnsutils
+      - fail2ban
+      - htop
+      - imagemagick
+      - iotop
+      - liblzma-dev
+      - libpcre3-dev
+      - mosh
+      - openssl
+      - pkg-config
+      - realpath
+      - vim
+      - zlib1g-dev
+      - python-setuptools
+  #    - paramiko
+
+  - name: add 'chris-lea' PPA for node.js
+    apt_repository: repo=ppa:chris-lea/node.js
+
+  - name: Install nodeJS
+    apt: pkg=nodejs update_cache=yes state=latest
+
+  - name: Install Pip
+    easy_install: name=pip
+
+  - name: Install NPM Packages
+    npm: name={{item}} global=yes production=yes
+    with_items:
+      - winston
+      - express
+
+  - include: ag.yml

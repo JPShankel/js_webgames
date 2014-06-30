@@ -1,0 +1,1 @@
+{"virtualbox":{"/usr/ubshared":{"guestpath":"/usr/ubshared","hostpath":"/Users/jasonshankel/Code/ubshared","disabled":false},"/vagrant":{"guestpath":"/vagrant","hostpath":"/Users/jasonshankel/Code/ubshared/deployment/vagrant","disabled":false}}}

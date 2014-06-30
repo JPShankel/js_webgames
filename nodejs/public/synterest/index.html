@@ -1,0 +1,85 @@
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <title>Synterest</title>
+  </head>
+  <body>
+
+
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
+  <section id="synterest-app">
+
+    <nav class="navbar navbar-default" role="navigation">
+      <div class="navbar-header">
+        <p class="navbar-text">Synterest</p>
+      </div>
+    </nav>
+
+    <div class="row panel-body">
+      <div class="panel-body col-sm-3" id="player-list-container">
+      </div>
+     
+     <div class="panel-body col-sm-3"  id="player-frame-list-container">
+      </div>
+     </div>
+
+     <div class="row">
+      <div class = "col-sm-12" style="height:300px;border:1px solid #000;">
+          <button type="button" class="btn btn-default btn-lg" style="position:absolute;right:20px;bottom:5px;">
+            <span class="glyphicon glyphicon-star"></span> Star
+          </button>
+      </div>
+     </div>
+
+    <div class="row">
+      <div class = "col-sm-4" style="height:100px;border:1px solid #000;">
+        
+          <button type="button" class="btn btn-default btn-sm" style="position:absolute;right:5px;bottom:5px;">
+            <span class="glyphicon glyphicon-star"></span> Star
+          </button>
+
+      </div>
+      <div class = "col-sm-4" style="height:100px;border:1px solid #000;">
+          <button type="button" class="btn btn-default btn-sm" style="position:relative;top:10%;display:block;margin: 0 auto;width:80%;height:80%">
+            <span class="glyphicon glyphicon-star"></span> Star
+          </button>
+      </div>
+      <div class = "col-sm-4" style="height:100px;border:1px solid #000;">
+      </div>
+    </div>
+
+  </section>
+
+  <script type="text/template"  id="player-list-view">
+  <select onChange = "selectPlayer(this.value);">
+  <% var attr = this.model.get('value'); %>
+  <% for (var v=0;v<attr.players.length;v++) { %>
+    <option value=<%=getPlayerID(attr.players[v])%>> <%= getPlayerName(attr.players[v]) %> </option>
+  <% } %> 
+  </select>
+  </script>
+
+  <script type="text/template"  id="player-frame-list-view">
+  <select onChange = "selectFrame(this.value);">
+  <% var attr = this.model.get('value'); %>
+  <% for (var v=0;v<attr.temporals.length;v++) { %>
+    <option value=<%=getFrameID(attr.temporals[v])%>> <%= getFrameID(attr.temporals[v]) %> </option>
+  <% } %> 
+  </select>
+  </script>
+
+
+    <script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/underscore.js"></script>
+    <script src="js/backbone.js"></script>
+
+    <script src="js/synterest.js" type="text/javascript"></script>
+  </body>
+  </html>
+           
