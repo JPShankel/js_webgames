@@ -9,14 +9,21 @@ $(document).ready(function() {
 
 
   var scanner = document.getElementById('scanner');
-  
+
+  document.addEventListener('keydown',function(evt){
+    console.log("KEY DOWN");
+    console.log(evt);
+  });
+
   scanner.addEventListener('mouseout',function(e){
   	mouseGrid.x = mouseGrid.y = -1;
   	redrawScene();
   },false);
 
   scanner.addEventListener('mousemove',function(e){
-  	var newGrid = {x:Math.floor(e.offsetX*8/600),y:Math.floor(e.offsetY*8/400)};
+    var canvas =document.getElementById("scanner");
+
+  	var newGrid = {x:Math.floor(e.offsetX*8/canvas.width),y:Math.floor(e.offsetY*8/canvas.height)};
   	if (newGrid.x!=mouseGrid.x ||newGrid.y!=mouseGrid.y) {
   		mouseGrid = newGrid;
   		redrawScene();
@@ -163,7 +170,7 @@ function frameTimer() {
 			}
 
 			t.points = [];
-		} 
+		}
 		else if (time-t.baseTime > t.interval) {
 			t.baseTime = time;
 			t.points = t.points.slice(1,t.points.length);
@@ -243,7 +250,7 @@ function redrawScene() {
 
 
 	placeObjectOnGrid(imageMap['svg/ship.svg'],scene.ship.x,scene.ship.y);
-	
+
 	if (mouseGrid.x != -1) {
 		placeObjectOnGrid(imageMap['svg/cursor.svg'],mouseGrid.x,mouseGrid.y);
 	}
@@ -273,16 +280,16 @@ function drawGrid() {
 	var canvas =document.getElementById("scanner");
 	var context =canvas.getContext("2d");
 	context.fillStyle="#000000";
-	context.fillRect(0,0,600,400);
+	context.fillRect(0,0,canvas.width,canvas.height);
 	context.strokeStyle="#00A000";
 	context.lineWidth = 2;
 
-	for (var g=0;g<=8;g++) {		
+	for (var g=0;g<=8;g++) {
 		context.beginPath();
 		context.moveTo((g*canvas.width)/8,0);
 		context.lineTo((g*canvas.width)/8,canvas.height);
 		context.stroke();
-		
+
 
 		context.beginPath();
 		context.moveTo(0,canvas.height*g/8);
@@ -297,7 +304,7 @@ function clipCourse(points) {
 		ret.push(points[p]);
 		if (coordOccupied(scene,points[p].x,points[p].y)) {
 			return ret;
-		} 
+		}
 	}
 	return ret;
 }
@@ -449,5 +456,3 @@ function bresenhamLine(x0,y0,x1,y1,points) {
 		points.push({x:x0,y:y0});
 	}
 }
-
-
