@@ -13,8 +13,8 @@
   - name: Update APT package cache
     apt: update_cache=yes
 
-#  - name: Install packages
-#    apt: pkg={{ item }} state=installed
+  - name: Install packages
+    apt: pkg={{ item }} state=installed
     with_items:
       - bash-completion
       - curl
@@ -44,11 +44,11 @@
   - name: Install Pip
     easy_install: name=pip
 
-  - name: Install NPM Packages
-    npm: name={{item}} global=yes production=yes
-    with_items:
-      - winston
-      - express
+  - name: Install Winston
+    npm: name=winston global=yes production=yes
+
+  - name: Install Express
+    npm: name=express global=yes production=yes
 
   - include: ag.yml
 
@@ -67,11 +67,12 @@
   - name: install apiserver
     copy: src=./apiserver_supervisor.conf dest=/etc/supervisor/conf.d/apiserver_supervisor.conf owner=root group=root mode=0644
 
+  - name: copy apiserver supervisord config
+    template: src=apiserver-init.j2 dest=/etc/supervisor/apiserver.conf owner=root group=root mode=0644
+
   - name: start supervisord
     service: name=supervisord enabled=yes state=started
 
-  - name: copy apiserver supervisord config
-    template: src=apiserver-init.j2 dest=/etc/supervisor/apiserver.conf owner=root group=root mode=0644
-    notify:
-      - reload supervisord
-      - restart apiserver
+  - name: reload supervisor
+    sudo: yes
+    shell: supervisorctl reload
