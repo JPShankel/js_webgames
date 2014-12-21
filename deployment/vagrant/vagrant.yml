@@ -64,11 +64,11 @@
   - name: copy supervisord init script
     copy: src=./supervisord_init.conf dest=/etc/init/supervisord.conf owner=root group=root mode=0755
 
-  - name: install apiserver
-    copy: src=./apiserver_supervisor.conf dest=/etc/supervisor/conf.d/apiserver_supervisor.conf owner=root group=root mode=0644
+  - name: install node_server
+    copy: src=./node_server_supervisor.conf dest=/etc/supervisor/conf.d/node_server_supervisor.conf owner=root group=root mode=0644
 
-  - name: copy apiserver supervisord config
-    template: src=apiserver-init.j2 dest=/etc/supervisor/apiserver.conf owner=root group=root mode=0644
+  - name: copy node_server supervisord config
+    template: src=node_server_init.j2 dest=/etc/supervisor/node_server.conf owner=root group=root mode=0644
 
   - name: start supervisord
     service: name=supervisord enabled=yes state=started
