@@ -1,0 +1,6 @@
+[program:apiserver]
+command=/usr/bin/node /home/{{ username }}/apiserver.js
+user={{ username }}
+environment=HOME=/home/{{ username }},USER={{ username }}
+redirect_stderr=true
+stdout_logfile=/var/log/apiserver.log
