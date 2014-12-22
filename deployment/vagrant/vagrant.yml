@@ -44,12 +44,6 @@
   - name: Install Pip
     easy_install: name=pip
 
-  - name: Install Winston
-    npm: name=winston global=yes production=yes
-
-  - name: Install Express
-    npm: name=express global=yes production=yes
-
   - include: ag.yml
 
   - name: install supervisor
@@ -69,6 +63,12 @@
 
   - name: copy node_server supervisord config
     template: src=node_server_init.j2 dest=/etc/supervisor/node_server.conf owner=root group=root mode=0644
+
+  - name: intall winston
+    npm: name=winston path=/usr/js_webgames/nodejs
+
+  - name: install express
+    npm: name=express path=/usr/js_webgames/nodejs
 
   - name: start supervisord
     service: name=supervisord enabled=yes state=started

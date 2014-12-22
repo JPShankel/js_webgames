@@ -25,6 +25,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vb.customize ["modifyvm", :id, "--memory", "1024", "--name", "ansible-plaything"]
   end
 
-  config.vm.synced_folder "../../", "/usr/ubshared"
+  config.vm.synced_folder "../../", "/usr/js_webgames"
 
 end
