@@ -32,6 +32,7 @@
       - vim
       - zlib1g-dev
       - python-setuptools
+      - mono-complete
   #    - paramiko
 
 

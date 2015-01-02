@@ -9,16 +9,10 @@
   </head>
   <body>
 
-    <nav class="trek-navbar navbar navbar-default btn-navbar" role="navigation">
+  <nav class="trek-navbar navbar navbar-default btn-navbar" role="navigation">
       <p class="trek-text navbar-text" style="color:#ffffff">Web Trek</p>
       <button type="button" class="btn" style = "margin-top:10px;" onclick="onclickGenerateSector(this);">Generate</button>
-
-  <a href="#" class="btn btn-lg btn-success"
-   data-toggle="modal"
-   data-target="#basicModal">Click to open Modal</a>
-
-
-    </nav>
+  </nav>
 
     <div class = "row">
       <div class = "col-sm-1">
@@ -36,10 +30,6 @@
           <button type="button" class="trek-control-panel-btn form-control" style="width:100%" onclick="dockShip(this);">Dock</button>
 
           <button type="button" class="trek-control-panel-btn form-control" style="width:100%" onclick="travelTo(this);">Travel</button>
-
-
-
-
         </div>
 
         <div class = "trek-control-panel col-sm-2" style="width:100%;height:45%;" id="lock-scanner">
@@ -75,8 +65,71 @@
         </div><!-- /.modal-dialog -->
       </div><!-- /.modal -->
 
+
+      <div class="modal" id="mainMenuModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Super Web Trek</h4>
+            </div>
+
+            <div class="modal-body">
+              <div>
+                <button type="button" class="trek-menu-button btn btn-default btn-large" data-dismiss="modal" onclick="onClickNewGame();">New Game</button>
+              </div>
+              <br/>
+              <div>
+                <button type="button" class="trek-menu-button btn btn-default btn-large" data-dismiss="modal" onclick="onClickLoadGame();">Load Game</button>
+              </div>
+
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
+
+      <div class="modal" id="escapeMenuModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Super Web Trek</h4>
+            </div>
+
+            <div class="modal-body">
+              <div>
+                <button type="button" class="trek-menu-button btn btn-default btn-large" style="width:100%" data-dismiss="modal" onclick="onClickSaveGame();">Save Game</button>
+              </div>
+              <br/>
+              <div>
+                <button type="button" class="trek-menu-button btn btn-default btn-large" style="width:100%" data-dismiss="modal" onclick="onClickLoadGame();">Load Game</button>
+              </div>
+              <br/>
+              <div>
+                <button type="button" class="trek-menu-button btn btn-default btn-large" style="width:100%" data-dismiss="modal" onclick="onClickMainMenu();">Main Menu</button>
+              </div>
+              <br/>
+
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
     </div>
 
+    <div class="modal" id="loadGameModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Modal title</h4>
+          </div>
+          <div class="modal-body">
+            <p>One fine body…</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="onCancelLoadGame();">Close</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="onLoadSelectedGame();">Load Game</button>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
     <script src="js/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>

@@ -11,8 +11,7 @@ $(document).ready(function() {
   var scanner = document.getElementById('scanner');
 
   document.addEventListener('keydown',function(evt){
-    console.log("KEY DOWN");
-    console.log(evt);
+    gameStateManager.onKeyDown(evt);
   });
 
   scanner.addEventListener('mouseout',function(e){
@@ -144,6 +143,8 @@ function damageEnemy(enemy,points) {
 }
 
 function frameTimer() {
+
+  gameStateManager.onFrameUpdate();
 
 	setReadoutText(0,'Ship Status');
 	setReadoutText(1,'TORP: '+scene.ship.torpedoes);
@@ -456,3 +457,184 @@ function bresenhamLine(x0,y0,x1,y1,points) {
 		points.push({x:x0,y:y0});
 	}
 }
+
+function TrekGameState() {
+}
+
+TrekGameState.prototype.onEnter = function() {
+  console.log("enter "+this.name);
+  console.log(this);
+}
+
+TrekGameState.prototype.onExit = function() {
+  console.log("exit "+this.name);
+}
+
+TrekGameState.prototype.onKeyDown = function(evt) {
+  console.log(evt);
+}
+
+TrekGameState.prototype.onUpdate = function() {
+  console.log("update "+this.name);
+}
+
+TrekGameState.prototype.onFrameUpdate = function() {
+//  console.log("frame update "+this.name);
+}
+
+function NewGameState () {
+  this.name = "new game state";
+}
+NewGameState.prototype = new TrekGameState();
+NewGameState.prototype.onFrameUpdate = function() {
+  gameStateManager.setState(shortRangeState);
+}
+var newGameState = new NewGameState();
+
+function LoadGameState() {
+  this.name="load game state";
+}
+LoadGameState.prototype = new TrekGameState();
+LoadGameState.prototype.onEnter = function() {
+  TrekGameState.prototype.onEnter.call(this);
+  $("#loadGameModal").modal({backdrop:'static'});
+}
+var loadGameState = new LoadGameState();
+
+function SaveGameState() {
+  this.name="save game state";
+  this.showingDialog = false;
+}
+SaveGameState.prototype = new TrekGameState();
+SaveGameState.prototype.onEnter = function() {
+  TrekGameState.prototype.onEnter.call(this);
+  this.showingDialog = false;
+}
+SaveGameState.prototype.onFrameUpdate = function() {
+  if (!this.showingDialog) {
+    this.showingDialog = true;
+    var gameName = window.prompt("Enter Save Game Name");
+    if (gameName) {
+      alert("Game Saved!");
+      gameStateManager.setState(shortRangeState);
+    }
+    else {
+      gameStateManager.setState(escapeMenuState);
+    }
+  }
+}
+var saveGameState = new SaveGameState();
+
+function GameOverState() {
+  this.name="game over state";
+}
+GameOverState.prototype = new TrekGameState();
+var gameOverState = new GameOverState();
+
+function ShortRangeState() {
+  this.name="short range state";
+}
+ShortRangeState.prototype = new TrekGameState();
+ShortRangeState.prototype.onKeyDown = function(evt) {
+  if (evt.keyCode === 27) {
+    gameStateManager.setState(escapeMenuState);
+  } else {
+    TrekGameState.prototype.onKeyDown(evt);
+  }
+}
+var shortRangeState = new ShortRangeState();
+
+function LongRangeState() {
+  this.name="long range state";
+}
+LongRangeState.prototype = new TrekGameState();
+var longRangeState = new LongRangeState();
+
+function MainMenuState() {
+  this.name="main menu state";
+}
+MainMenuState.prototype = new TrekGameState();
+MainMenuState.prototype.onEnter = function() {
+  $("#mainMenuModal").modal({backdrop:'static'});
+  console.log("enter main menu state");
+}
+var mainMenuState = new MainMenuState();
+
+function EscapeMenuState() {
+  this.name="escape menu state";
+}
+EscapeMenuState.prototype = new TrekGameState();
+EscapeMenuState.prototype.onEnter = function() {
+  TrekGameState.prototype.onEnter.call(this);
+  $("#escapeMenuModal").modal({backdrop:'static'});
+}
+var escapeMenuState = new EscapeMenuState();
+
+var gameStateManager = {
+  setState : function(newState) {
+    if (this.currentState) {
+      this.currentState.onExit();
+    }
+    console.log("Setting State");
+    console.log(newState);
+    newState.onEnter();
+    this.currentState = newState;
+  },
+
+  onKeyDown : function(evt) {
+    if (this.currentState) {
+      this.currentState.onKeyDown(evt);
+    }
+  },
+
+  onFrameUpdate : function() {
+    if (this.currentState) {
+      this.currentState.onFrameUpdate();
+    }
+  },
+
+  pushState : function() {
+    this.stateStack.push(this.currentState);
+    console.log(this.stateStack);
+  },
+
+  popState : function(newState) {
+    if (this.currentState) {
+      this.currentState.onExit();
+    }
+    this.currentState = this.stateStack.pop();
+    if (newState) {
+      this.currentState = newState;
+    }
+    this.currentState.onEnter();
+    console.log(this.stateStack);
+  }
+}
+gameStateManager.stateStack = [];
+
+function onClickNewGame() {
+  gameStateManager.setState(newGameState);
+}
+
+function onClickLoadGame() {
+  gameStateManager.pushState();
+  gameStateManager.setState(loadGameState);
+}
+
+function onClickSaveGame() {
+  gameStateManager.setState(saveGameState);
+}
+
+function onClickMainMenu() {
+  gameStateManager.setState(mainMenuState);
+}
+
+function onLoadSelectedGame() {
+  gameStateManager.popState(shortRangeState);
+}
+
+function onCancelLoadGame() {
+  gameStateManager.popState();
+}
+
+gameStateManager.setState(mainMenuState);
