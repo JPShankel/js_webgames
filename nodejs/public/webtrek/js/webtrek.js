@@ -3,7 +3,6 @@ var mouseState = 'up';
 
 $(document).ready(function() {
   console.log('Web Trek loaded...');
-  generateSector();
 
   setInterval(frameTimer,10);
 
@@ -241,7 +240,7 @@ function redrawScene() {
 		placeObjectOnGrid(imageMap['svg/star.svg'],s.x,s.y);
 	});
 
-	scene.stations.forEach(function(s){
+	scene.bases.forEach(function(s){
 		placeObjectOnGrid(imageMap['svg/station.svg'],s.x,s.y);
 	});
 
@@ -359,22 +358,15 @@ function travelTo(btn) {
 	}
 }
 
-function onclickGenerateSector(btn) {
-	lockCursor = null;
-	generateSector();
-	redrawScene();
-	btn.blur();
-}
-
 function coordOccupied(scene,x,y) {
 	for (var s=0;s<scene.stars.length;s++) {
 		if (scene.stars[s].x == x && scene.stars[s].y == y) {
 			return {object:scene.stars[s],type:'svg/star.svg'};
 		}
 	}
-	for (var s=0;s<scene.stations.length;s++) {
-		if (scene.stations[s].x == x && scene.stations[s].y == y) {
-			return {object:scene.stations[s],type:'svg/station.svg'};
+	for (var s=0;s<scene.bases.length;s++) {
+		if (scene.bases[s].x == x && scene.bases[s].y == y) {
+			return {object:scene.bases[s],type:'svg/station.svg'};
 		}
 	}
 	for (var s=0;s<scene.enemies.length;s++) {
@@ -396,42 +388,6 @@ function findFreeSpot(scene) {
 	}
 	return [x,y];
 }
-
-function generateSector() {
-	var numStars = 1 + randomInt(1,8);
-	scene = {};
-	scene.stars = [];
-	scene.stations = [];
-	scene.enemies = [];
-	for (var n=0;n<numStars;n++) {
-		var loc = findFreeSpot(scene);
-		scene.stars.push({x:loc[0],y:loc[1]});
-	}
-
-	if (randomInt(0,2)==0) {
-		var numStations = 1 + randomInt(0,2);
-		for (var n=0;n<numStations;n++) {
-			var loc = findFreeSpot(scene);
-			scene.stations.push({x:loc[0],y:loc[1],friendly:true});
-		}
-	}
-
-	if (randomInt(0,2)==0) {
-		var numEnemies = 1 + randomInt(0,2);
-		for (var n=0;n<numEnemies;n++) {
-			var loc = findFreeSpot(scene);
-			scene.enemies.push({x:loc[0],y:loc[1],damage:999});
-		}
-	}
-
-	var loc = findFreeSpot(scene);
-	scene.ship = {x:loc[0],y:loc[1]};
-	scene.ship.torpedoes = 9;
-	scene.ship.energy = 999;
-	scene.ship.shields = 100;
-
-}
-
 
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -638,3 +594,154 @@ function onCancelLoadGame() {
 }
 
 gameStateManager.setState(mainMenuState);
+
+var trekGameScene = {
+  stars: [],
+  bases: [],
+  enemies: [],
+  ship: [0,0]
+};
+
+function TrekPosition(quadx,quady,secx,secy) {
+  this.quadx=quadx;
+  this.quady=quady;
+  this.secx=secx;
+  this.secy=secy;
+}
+
+function TrekObject(quadx,quady,secx,secy,type) {
+  this.position = new TrekPosition(quadx,quady,secx,secy);
+  this.type = type;
+}
+
+function TrekQuadrant() {
+  this.stars = [];
+  this.enemies = [];
+  this.bases = [];
+}
+
+TrekQuadrant.prototype.getSectorObjects = function(sx,sy) {
+  var ret = [];
+
+  for (var o in this.stars) {
+    if (this.stars[o].position.secx === sx && this.stars[o].position.secy === sy) {
+      ret.push(this.stars[o]);
+    }
+  }
+
+  for (var o in this.enemies) {
+    if (this.enemies[o].position.secx === sx && this.enemies[o].position.secy === sy) {
+      ret.push(this.enemies[o]);
+    }
+  }
+
+  for (var o in this.bases) {
+    if (this.bases[o].position.secx === sx && this.bases[o].position.secy === sy) {
+      ret.push(this.bases[o]);
+    }
+  }
+
+  return ret;
+}
+
+TrekQuadrant.prototype.getObjectCount = function(type) {
+  if (type === "star") {
+    return this.stars.length;
+  }
+  if (type === "base") {
+    return this.bases.length;
+  }
+  if (type === "enemy") {
+    return this.enemies.length;
+  }
+}
+
+TrekQuadrant.prototype.createObjectAt = function(qx,qy,sx,sy,type) {
+  var newOb = new TrekObject(qx,qy,sx,sy,type);
+  if (type==="star") {
+    this.stars.push(newOb);
+  } else if (type==="base") {
+    this.bases.push(newOb);
+  } else if (type==="enemy") {
+    this.enemies.push(newOb);
+  }
+  return newOb;
+}
+
+var trekGameModel = {
+  shipPosition: new TrekPosition(0,0,0,0),
+  quadrantData: [],
+
+  init: function() {
+    for (var i=0;i<8;++i) {
+      var row = [];
+      for (var j=0;j<8;++j) {
+        row.push(new TrekQuadrant());
+      }
+      this.quadrantData.push(row);
+    }
+  },
+
+  generateObjects: function(type,count,quadLimit) {
+    for (var i=0;i<count;++i) {
+      var qx,qy;
+      do {
+        qx = Math.floor(Math.random()*8);
+        qy = Math.floor(Math.random()*8);
+      } while (this.quadrantData[qx][qy].getObjectCount(type) >= quadLimit);
+      var sx,sy;
+      do {
+        sx = Math.floor(Math.random()*8);
+        sy = Math.floor(Math.random()*8);
+      } while (this.quadrantData[qx][qy].getSectorObjects(sx,sy).length > 0);
+      this.quadrantData[qx][qy].createObjectAt(qx,qy,sx,sy,type);
+    }
+  },
+
+  generate: function(numStars,numBases,numEnemies) {
+    this.generateObjects("star",numStars,7);
+    this.generateObjects("base",numBases,2);
+    this.generateObjects("enemy",numEnemies,3);
+  }
+};
+
+trekGameModel.init();
+trekGameModel.generate(200+Math.floor(Math.random()*247),8,20);
+loadQuadrant(0,0);
+
+
+function loadQuadrant(qx,qy) {
+
+  var quadrant = trekGameModel.quadrantData[qx][qy];
+  scene = {};
+  scene.stars = [];
+  scene.bases = [];
+  scene.enemies = [];
+
+  for (var n in quadrant.stars) {
+    scene.stars.push({
+      x:quadrant.stars[n].position.secx,
+      y:quadrant.stars[n].position.secy
+    });
+  }
+
+  for (var n in quadrant.bases) {
+    scene.bases.push({
+      x:quadrant.bases[n].position.secx,
+      y:quadrant.bases[n].position.secy
+    });
+  }
+
+  for (var n in quadrant.enemies) {
+    scene.enemies.push({
+      x:quadrant.enemies[n].position.secx,
+      y:quadrant.enemies[n].position.secy
+    });
+  }
+
+  var loc = findFreeSpot(scene);
+  scene.ship = {x:loc[0],y:loc[1]};
+  scene.ship.torpedoes = 9;
+  scene.ship.energy = 999;
+  scene.ship.shields = 100;
+}
