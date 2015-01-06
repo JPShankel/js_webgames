@@ -15,7 +15,7 @@ $(document).ready(function() {
 
   scanner.addEventListener('mouseout',function(e){
   	mouseGrid.x = mouseGrid.y = -1;
-  	redrawScene();
+  	trekGameScene.redrawScene();
   },false);
 
   scanner.addEventListener('mousemove',function(e){
@@ -24,7 +24,7 @@ $(document).ready(function() {
   	var newGrid = {x:Math.floor(e.offsetX*8/canvas.width),y:Math.floor(e.offsetY*8/canvas.height)};
   	if (newGrid.x!=mouseGrid.x ||newGrid.y!=mouseGrid.y) {
   		mouseGrid = newGrid;
-  		redrawScene();
+      trekGameScene.redrawScene();
   	}
   });
 
@@ -51,8 +51,8 @@ $(document).ready(function() {
   	'svg/torpedo.svg',
   	'svg/lockCursor.svg'];
 
-  async.each(images,loadImage,function(err){
-  	redrawScene();
+  async.each(images,trekGameScene.loadImage,function(err){
+    trekGameScene.redrawScene();
   });
 
 });
@@ -72,14 +72,14 @@ function frameTimer() {
 
   gameStateManager.onFrameUpdate();
 
-	setReadoutText(0,'Ship Status');
-	setReadoutText(1,'TORP: '+scene.ship.torpedoes);
-	setReadoutText(2,'ENER: '+scene.ship.energy);
-	setReadoutText(3,'SHLD: '+scene.ship.shields);
-	setReadoutText(4,'');
+	trekGameScene.setReadoutText(0,'Ship Status');
+  trekGameScene.setReadoutText(1,'TORP: '+trekGameScene.ship.torpedoes);
+  trekGameScene.setReadoutText(2,'ENER: '+trekGameScene.ship.energy);
+  trekGameScene.setReadoutText(3,'SHLD: '+trekGameScene.ship.shields);
+  trekGameScene.setReadoutText(4,'');
 
-	setReadoutText(5,'Target Status');
-	setReadoutText(6,getTargetStatusString());
+  trekGameScene.setReadoutText(5,'Target Status');
+  trekGameScene.setReadoutText(6,trekGameScene.getTargetStatusString());
 
 	var time = new Date().getTime();
 	var wantRedraw = torpedoes.length > 0 || phasers.length > 0;

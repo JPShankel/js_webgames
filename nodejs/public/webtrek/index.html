@@ -75,11 +75,11 @@
 
             <div class="modal-body">
               <div>
-                <button type="button" class="trek-menu-button btn btn-default btn-large" data-dismiss="modal" onclick="onClickNewGame();">New Game</button>
+                <button type="button" class="trek-menu-button btn btn-default btn-large" data-dismiss="modal" onclick="gameStateManager.onClickNewGame();">New Game</button>
               </div>
               <br/>
               <div>
-                <button type="button" class="trek-menu-button btn btn-default btn-large" data-dismiss="modal" onclick="onClickLoadGame();">Load Game</button>
+                <button type="button" class="trek-menu-button btn btn-default btn-large" data-dismiss="modal" onclick="gameStateManager.onClickLoadGame();">Load Game</button>
               </div>
 
             </div>
@@ -124,8 +124,8 @@
             <p>One fine body…</p>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="onCancelLoadGame();">Close</button>
-            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="onLoadSelectedGame();">Load Game</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="gameStateManager.onCancelLoadGame();">Close</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="gameStateManager.onLoadSelectedGame();">Load Game</button>
           </div>
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->

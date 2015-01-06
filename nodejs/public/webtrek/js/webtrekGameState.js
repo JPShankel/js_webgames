@@ -188,33 +188,35 @@ var gameStateManager = {
     }
     this.currentState.onEnter();
     console.log(this.stateStack);
+  },
+
+  stateStack:[],
+
+  onClickNewGame : function() {
+    this.setState(newGameState);
+  },
+
+  onClickLoadGame : function() {
+    this.pushState();
+    this.setState(loadGameState);
+  },
+
+  onClickSaveGame : function() {
+    this.setState(saveGameState);
+  },
+
+  onClickMainMenu : function() {
+    this.setState(mainMenuState);
+  },
+
+  onLoadSelectedGame : function() {
+    this.popState(shortRangeState);
+  },
+
+  onCancelLoadGame : function() {
+    this.popState();
   }
-}
-gameStateManager.stateStack = [];
 
-function onClickNewGame() {
-  gameStateManager.setState(newGameState);
-}
-
-function onClickLoadGame() {
-  gameStateManager.pushState();
-  gameStateManager.setState(loadGameState);
-}
-
-function onClickSaveGame() {
-  gameStateManager.setState(saveGameState);
-}
-
-function onClickMainMenu() {
-  gameStateManager.setState(mainMenuState);
-}
-
-function onLoadSelectedGame() {
-  gameStateManager.popState(shortRangeState);
-}
-
-function onCancelLoadGame() {
-  gameStateManager.popState();
 }
 
 gameStateManager.setState(mainMenuState);

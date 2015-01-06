@@ -125,4 +125,4 @@ var trekGameModel = {
 
 trekGameModel.init();
 trekGameModel.generate(200+Math.floor(Math.random()*247),8,20);
-loadQuadrant(0,0);
+trekGameScene.loadQuadrant(0,0);
