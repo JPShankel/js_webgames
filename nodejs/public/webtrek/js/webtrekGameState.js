@@ -34,6 +34,10 @@ TrekGameState.prototype.onUpdate = function() {
 TrekGameState.prototype.onFrameUpdate = function() {
 }
 
+TrekGameState.prototype.onMouseOut = function() {
+
+}
+
 /*
 * NewGameState - app state handler for starting a new game
 */
@@ -109,6 +113,23 @@ ShortRangeState.prototype.onKeyDown = function(evt) {
     TrekGameState.prototype.onKeyDown(evt);
   }
 }
+ShortRangeState.prototype.onFrameUpdate = function() {
+  trekGameScene.onFrameUpdate();
+}
+ShortRangeState.prototype.onMouseMove = function(e) {
+  var canvas =document.getElementById("scanner");
+
+  var newGrid = {x:Math.floor(e.offsetX*8/canvas.width),y:Math.floor(e.offsetY*8/canvas.height)};
+  if (newGrid.x!=trekGameScene.mouseGrid.x || newGrid.y!=trekGameScene.mouseGrid.y) {
+    trekGameScene.mouseGrid = newGrid;
+    trekGameScene.onFrameUpdate();
+  }
+}
+ShortRangeState.prototype.onMouseOut = function() {
+  trekGameScene.mouseGrid.x = trekGameScene.mouseGrid.y = -1;
+  trekGameScene.redrawScene();
+}
+
 var shortRangeState = new ShortRangeState();
 
 /*
@@ -173,6 +194,18 @@ var gameStateManager = {
     }
   },
 
+  onMouseMove : function(e) {
+    if (this.currentState) {
+      this.currentState.onMouseMove(e);
+    }
+  },
+
+  onMouseOut: function() {
+    if (this.currentState) {
+      this.currentState.onMouseOut();
+    }
+  },
+
   pushState : function() {
     this.stateStack.push(this.currentState);
     console.log(this.stateStack);
@@ -218,5 +251,3 @@ var gameStateManager = {
   }
 
 }
-
-gameStateManager.setState(mainMenuState);

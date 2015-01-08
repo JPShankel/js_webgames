@@ -122,7 +122,3 @@ var trekGameModel = {
     this.generateObjects("enemy",numEnemies,3);
   }
 };
-
-trekGameModel.init();
-trekGameModel.generate(200+Math.floor(Math.random()*247),8,20);
-trekGameScene.loadQuadrant(0,0);

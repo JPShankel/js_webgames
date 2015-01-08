@@ -12,6 +12,7 @@ var trekGameScene = {
   bases: [],
   enemies: [],
   ship: [0,0],
+  mouseGrid:{x:0,y:0},
 
   placeObjectOnGrid: function(ob,x,y) {
     var canvas =document.getElementById("scanner");
@@ -32,13 +33,13 @@ var trekGameScene = {
     }
   },
 
-  redrawScene: function() {
+  onFrameUpdate: function() {
     var canvas =document.getElementById("scanner");
     var context =canvas.getContext("2d");
     context.clearRect(0,0,canvas.width,canvas.height);
 
-    this.drawGrid();
     var self = this;
+    self.drawGrid();
 
     self.stars.forEach(function(s){
       self.placeObjectOnGrid(imageMap['svg/star.svg'],s.x,s.y);
@@ -55,12 +56,12 @@ var trekGameScene = {
 
     self.placeObjectOnGrid(imageMap['svg/ship.svg'],self.ship.x,self.ship.y);
 
-    if (mouseGrid.x != -1) {
-      self.placeObjectOnGrid(imageMap['svg/cursor.svg'],mouseGrid.x,mouseGrid.y);
+    if (trekGameScene.mouseGrid.x != -1) {
+      self.placeObjectOnGrid(imageMap['svg/cursor.svg'],trekGameScene.mouseGrid.x,trekGameScene.mouseGrid.y);
     }
 
-    torpedoes.forEach(function(t){
-      this.placeObjectOnGrid(imageMap['svg/torpedo.svg'],t.points[0].x,t.points[0].y);
+    self.torpedoes.forEach(function(t){
+      self.placeObjectOnGrid(imageMap['svg/torpedo.svg'],t.points[0].x,t.points[0].y);
     });
 
     var canvas = document.getElementById('scanner');
@@ -106,7 +107,7 @@ var trekGameScene = {
     var ret = [];
     for (var p=0;p<points.length;p++) {
       ret.push(points[p]);
-      if (this.coordOccupied(scene,points[p].x,points[p].y)) {
+      if (this.coordOccupied(points[p].x,points[p].y)) {
         return ret;
       }
     }
@@ -118,7 +119,7 @@ var trekGameScene = {
     if (this.phasers.length == 0 && lockCursor) {
       var points=[];
 
-      var target = this.coordOccupied(scene,lockCursor.x,lockCursor.y);
+      var target = this.coordOccupied(lockCursor.x,lockCursor.y);
       if (target && target.type === 'svg/enemy.svg') {
         bresenhamLine(this.ship.x,this.ship.y,lockCursor.x,lockCursor.y,points);
         if (points.length > 1) {
@@ -205,6 +206,8 @@ var trekGameScene = {
     this.stars = [];
     this.bases = [];
     this.enemies = [];
+    this.phasers = [];
+    this.torpedoes = [];
 
     for (var n in quadrant.stars) {
       this.stars.push({
@@ -233,12 +236,12 @@ var trekGameScene = {
     this.ship.energy = 999;
     this.ship.shields = 100;
 
-    this.redrawScene();
+    this.onFrameUpdate();
   },
 
   firePhasersCoords: function(x0,y0,x1,y1,duration) {
 
-    var target = coordOccupied(scene,x1,y1);
+    var target = this.coordOccupied(x1,y1);
     if (target && target.type === 'svg/enemy.svg') {
 
       this.phasers.push({points:[{x:x0+0.5,y:y0+0.5},{x:x1+0.5,y:y1+0.5}],
@@ -303,6 +306,73 @@ var trekGameScene = {
     this.enemies = this.enemies.filter(function(o){
       return o.damage > 0;
     });
+  },
+
+  frameUpdate: function() {
+    var self = this;
+    self.setReadoutText(0,'Ship Status');
+    self.setReadoutText(1,'TORP: '+self.ship.torpedoes);
+    self.setReadoutText(2,'ENER: '+self.ship.energy);
+    self.setReadoutText(3,'SHLD: '+self.ship.shields);
+    self.setReadoutText(4,'');
+
+    self.setReadoutText(5,'Target Status');
+    self.setReadoutText(6,self.getTargetStatusString());
+
+    var time = new Date().getTime();
+    var wantRedraw = self.torpedoes.length > 0 || self.phasers.length > 0;
+    self.torpedoes.forEach(function(t){
+      var impact = self.checkTorpedoImpact(t);
+      if (impact !== null && impact.type !== 'svg/ship.svg') {
+        console.log('impact at '+t.points[0].x+','+t.points[0].y+' with '+impact.type);
+
+        if (impact.type === 'svg/station.svg') {
+          impact.object.friendly = false;
+        }
+
+        if (impact.type === 'svg/enemy.svg') {
+          self.damageEnemy(impact.object,200+randomInt(0,1000));
+        }
+
+        t.points = [];
+      }
+      else if (time-t.baseTime > t.interval) {
+        t.baseTime = time;
+        t.points = t.points.slice(1,t.points.length);
+      }
+    });
+    self.torpedoes = self.torpedoes.filter(function(t){
+      return t.points.length > 0;
+    });
+
+    self.phasers = self.phasers.filter(function(p){
+      if (time-p.baseTime > p.duration) {
+        self.damageEnemy(p.target,p.energy);
+        self.ship.energy -= p.energy;
+        return false;
+      } else {
+        return true;
+      }
+    });
+
+    wantRedraw = wantRedraw || self.phasers.length > 0;
+
+
+    if (course.length > 0 && time-travelBaseTime > 500) {
+      travelBaseTime = time;
+      self.ship.x = course[0].x;
+      self.ship.y = course[0].y;
+      course = course.splice(1,course.length);
+      if (course.length == 0) {
+        lockCursor = null;
+      }
+      wantRedraw = true;
+    }
+
+
+    if (wantRedraw) {
+      self.onFrameUpdate();
+    }
   }
 
 };

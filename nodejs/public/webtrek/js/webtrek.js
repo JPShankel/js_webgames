@@ -4,9 +4,6 @@ var mouseState = 'up';
 $(document).ready(function() {
   console.log('Web Trek loaded...');
 
-  setInterval(frameTimer,10);
-
-
   var scanner = document.getElementById('scanner');
 
   document.addEventListener('keydown',function(evt){
@@ -14,32 +11,26 @@ $(document).ready(function() {
   });
 
   scanner.addEventListener('mouseout',function(e){
-  	mouseGrid.x = mouseGrid.y = -1;
-  	trekGameScene.redrawScene();
+    gameStateManager.onMouseOut();
   },false);
 
   scanner.addEventListener('mousemove',function(e){
-    var canvas =document.getElementById("scanner");
-
-  	var newGrid = {x:Math.floor(e.offsetX*8/canvas.width),y:Math.floor(e.offsetY*8/canvas.height)};
-  	if (newGrid.x!=mouseGrid.x ||newGrid.y!=mouseGrid.y) {
-  		mouseGrid = newGrid;
-      trekGameScene.redrawScene();
-  	}
+    gameStateManager.onMouseMove(e);
   });
 
   scanner.addEventListener('mousedown',function(e) {
-  	mouseState='down';
+    gameStateManager.onMouseDown(e);
   });
 
   scanner.addEventListener('mouseup',function(e){
+    gameStateManager.onMouseUp(e);
   	if (mouseState === 'down') {
 	  	mouseState = 'up';
 	  	if (mouseGrid.x != -1) {
 	  		lockCursor = mouseGrid;
 	  	}
   	}
-  	redrawScene();
+  	trekGameScene.redrawScene();
   });
 
 
@@ -52,15 +43,18 @@ $(document).ready(function() {
   	'svg/lockCursor.svg'];
 
   async.each(images,trekGameScene.loadImage,function(err){
-    trekGameScene.redrawScene();
+    trekGameModel.init();
+    trekGameModel.generate(200+Math.floor(Math.random()*247),8,20);
+    trekGameScene.loadQuadrant(0,0);
+    gameStateManager.setState(mainMenuState);
+    setInterval(frameTimer,10);
+
   });
+
 
 });
 
 var imageMap = {};
-var mouseGrid = {x:-1,y:-1};
-var torpedoes = [];
-var phasers = [];
 var lockCursor = null;
 var course = [];
 var travelBaseTime = 0;
@@ -69,72 +63,7 @@ var phaserEnergy = 100;
 var torpedoInterval = 200;
 
 function frameTimer() {
-
   gameStateManager.onFrameUpdate();
-
-	trekGameScene.setReadoutText(0,'Ship Status');
-  trekGameScene.setReadoutText(1,'TORP: '+trekGameScene.ship.torpedoes);
-  trekGameScene.setReadoutText(2,'ENER: '+trekGameScene.ship.energy);
-  trekGameScene.setReadoutText(3,'SHLD: '+trekGameScene.ship.shields);
-  trekGameScene.setReadoutText(4,'');
-
-  trekGameScene.setReadoutText(5,'Target Status');
-  trekGameScene.setReadoutText(6,trekGameScene.getTargetStatusString());
-
-	var time = new Date().getTime();
-	var wantRedraw = torpedoes.length > 0 || phasers.length > 0;
-	torpedoes.forEach(function(t){
-		var impact = checkTorpedoImpact(t);
-		if (impact !== null && impact.type !== 'svg/ship.svg') {
-			console.log('impact at '+t.points[0].x+','+t.points[0].y+' with '+impact.type);
-
-			if (impact.type === 'svg/station.svg') {
-				impact.object.friendly = false;
-			}
-
-			if (impact.type === 'svg/enemy.svg') {
-				damageEnemy(impact.object,200+randomInt(0,1000));
-			}
-
-			t.points = [];
-		}
-		else if (time-t.baseTime > t.interval) {
-			t.baseTime = time;
-			t.points = t.points.slice(1,t.points.length);
-		}
-	});
-	torpedoes = torpedoes.filter(function(t){
-		return t.points.length > 0;
-	});
-
-	phasers = phasers.filter(function(p){
-		if (time-p.baseTime > p.duration) {
-			damageEnemy(p.target,p.energy);
-			scene.ship.energy -= p.energy;
-			return false;
-		} else {
-			return true;
-		}
-	});
-
-	wantRedraw = wantRedraw || phasers.length > 0;
-
-
-	if (course.length > 0 && time-travelBaseTime > 500) {
-		travelBaseTime = time;
-		scene.ship.x = course[0].x;
-		scene.ship.y = course[0].y;
-		course = course.splice(1,course.length);
-		if (course.length == 0) {
-			lockCursor = null;
-		}
-		wantRedraw = true;
-	}
-
-
-	if (wantRedraw) {
-		redrawScene();
-	}
 }
 
 
