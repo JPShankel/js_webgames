@@ -24,13 +24,9 @@ $(document).ready(function() {
 
   scanner.addEventListener('mouseup',function(e){
     gameStateManager.onMouseUp(e);
-  	if (mouseState === 'down') {
-	  	mouseState = 'up';
-	  	if (mouseGrid.x != -1) {
-	  		lockCursor = mouseGrid;
-	  	}
+	  if (trekGameScene.mouseGrid.x != -1) {
+	  		trekGameScene.lockCursor = trekGameScene.mouseGrid;
   	}
-  	trekGameScene.redrawScene();
   });
 
 
@@ -55,7 +51,6 @@ $(document).ready(function() {
 });
 
 var imageMap = {};
-var lockCursor = null;
 var course = [];
 var travelBaseTime = 0;
 var phaserEnergy = 100;

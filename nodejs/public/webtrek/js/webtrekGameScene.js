@@ -13,6 +13,7 @@ var trekGameScene = {
   enemies: [],
   ship: [0,0],
   mouseGrid:{x:0,y:0},
+  lockCursor:{x:-1,y:-1},
 
   placeObjectOnGrid: function(ob,x,y) {
     var canvas =document.getElementById("scanner");
@@ -33,7 +34,7 @@ var trekGameScene = {
     }
   },
 
-  onFrameUpdate: function() {
+  redrawScene: function() {
     var canvas =document.getElementById("scanner");
     var context =canvas.getContext("2d");
     context.clearRect(0,0,canvas.width,canvas.height);
@@ -75,8 +76,8 @@ var trekGameScene = {
 
     });
 
-    if (lockCursor) {
-      this.placeObjectOnGrid(imageMap['svg/lockCursor.svg'],lockCursor.x,lockCursor.y);
+    if (this.lockCursor) {
+      this.placeObjectOnGrid(imageMap['svg/lockCursor.svg'],this.lockCursor.x,this.lockCursor.y);
     }
   },
 
@@ -116,12 +117,12 @@ var trekGameScene = {
 
   firePhasers: function(btn) {
     btn.blur();
-    if (this.phasers.length == 0 && lockCursor) {
+    if (this.phasers.length == 0 && this.lockCursor) {
       var points=[];
 
-      var target = this.coordOccupied(lockCursor.x,lockCursor.y);
+      var target = this.coordOccupied(this.lockCursor.x,this.lockCursor.y);
       if (target && target.type === 'svg/enemy.svg') {
-        bresenhamLine(this.ship.x,this.ship.y,lockCursor.x,lockCursor.y,points);
+        bresenhamLine(this.ship.x,this.ship.y,this.lockCursor.x,this.lockCursor.y,points);
         if (points.length > 1) {
           console.log(points);
           points = [{x:this.ship.x,y:this.ship.y}].concat(this.clipCourse(points.slice(1,points.length)));//.join({x:scene.ship.x,y:scene.ship.y});
@@ -136,9 +137,9 @@ var trekGameScene = {
 
   fireTorpedo: function(btn) {
     if (this.ship.torpedoes > 0) {
-      if (lockCursor) {
+      if (this.lockCursor) {
         this.ship.torpedoes -= 1;
-        this.fireTorpedoCoords(this.ship.x,this.ship.y,lockCursor.x,lockCursor.y,torpedoInterval);
+        this.fireTorpedoCoords(this.ship.x,this.ship.y,this.lockCursor.x,this.lockCursor.y,torpedoInterval);
       }
     }
     btn.blur();
@@ -150,9 +151,9 @@ var trekGameScene = {
 
   travelTo: function(btn) {
     btn.blur();
-    if (lockCursor) {
+    if (this.lockCursor) {
       var points = [];
-      bresenhamLine(this.ship.x,this.ship.y,lockCursor.x,lockCursor.y,points);
+      bresenhamLine(this.ship.x,this.ship.y,this.lockCursor.x,this.lockCursor.y,points);
       points = points.slice(1,points.length);
       if (points.length > 0) {
         if (this.coordOccupied(points[points.length-1].x,points[points.length-1].y)){
@@ -236,7 +237,7 @@ var trekGameScene = {
     this.ship.energy = 999;
     this.ship.shields = 100;
 
-    this.onFrameUpdate();
+    this.redrawScene();
   },
 
   firePhasersCoords: function(x0,y0,x1,y1,duration) {
@@ -273,11 +274,11 @@ var trekGameScene = {
   },
 
   getTargetStatusString: function() {
-    if (lockCursor===null) {
+    if (this.lockCursor===null) {
       return 'No Target';
     }
 
-    var object = this.coordOccupied(lockCursor.x,lockCursor.y);
+    var object = this.coordOccupied(this.lockCursor.x,this.lockCursor.y);
     if (object===null) {
       return 'No Target';
     }
@@ -364,14 +365,14 @@ var trekGameScene = {
       self.ship.y = course[0].y;
       course = course.splice(1,course.length);
       if (course.length == 0) {
-        lockCursor = null;
+        this.lockCursor = null;
       }
       wantRedraw = true;
     }
 
 
     if (wantRedraw) {
-      self.onFrameUpdate();
+      self.redrawScene();
     }
   }
 
