@@ -51,6 +51,10 @@ function NewGameState () {
 }
 NewGameState.prototype = new TrekGameState();
 NewGameState.prototype.onFrameUpdate = function() {
+
+  trekGameModel.generate(200+Math.floor(Math.random()*247),8,20);
+  trekGameScene.loadQuadrant(0,0);
+
   gameStateManager.setState(shortRangeState);
 }
 var newGameState = new NewGameState();
@@ -133,6 +137,12 @@ ShortRangeState.prototype.onMouseMove = function(e) {
 ShortRangeState.prototype.onMouseOut = function() {
   trekGameScene.mouseGrid.x = trekGameScene.mouseGrid.y = -1;
   trekGameScene.redrawScene();
+}
+ShortRangeState.prototype.onMouseUp = function(e) {
+  if (trekGameScene.mouseGrid.x != -1) {
+    trekGameScene.lockCursor = trekGameScene.mouseGrid;
+    trekGameScene.redrawScene();
+  }
 }
 
 var shortRangeState = new ShortRangeState();
@@ -260,6 +270,8 @@ var gameStateManager = {
   },
 
   onLoadSelectedGame : function() {
+    trekGameModel.generate(200+Math.floor(Math.random()*247),8,20);
+    trekGameScene.loadQuadrant(0,0);
     this.popState(shortRangeState);
   },
 

@@ -11,9 +11,13 @@ var trekGameScene = {
   stars: [],
   bases: [],
   enemies: [],
-  ship: [0,0],
-  mouseGrid:{x:0,y:0},
-  lockCursor:{x:-1,y:-1},
+  ship: {x:0,y:0,energy:1000,torpedoes:10},
+  mouseGrid: {x:0,y:0},
+  lockCursor: {x:-1,y:-1},
+  imageMap: {},
+  course: [],
+  travelBaseTime: 0,
+  torpedoInterval: 200,
 
   placeObjectOnGrid: function(ob,x,y) {
     var canvas =document.getElementById("scanner");
@@ -27,9 +31,10 @@ var trekGameScene = {
     var source = new Image();
     source.src = url;
 
+    var self = trekGameScene;
 
     source.onload = function(){
-      imageMap[file] = source;
+      self.imageMap[file] = source;
       callback(null);
     }
   },
@@ -43,26 +48,26 @@ var trekGameScene = {
     self.drawGrid();
 
     self.stars.forEach(function(s){
-      self.placeObjectOnGrid(imageMap['svg/star.svg'],s.x,s.y);
+      self.placeObjectOnGrid(self.imageMap['svg/star.svg'],s.x,s.y);
     });
 
     self.bases.forEach(function(s){
-      self.placeObjectOnGrid(imageMap['svg/station.svg'],s.x,s.y);
+      self.placeObjectOnGrid(self.imageMap['svg/station.svg'],s.x,s.y);
     });
 
     self.enemies.forEach(function(e){
-      self.placeObjectOnGrid(imageMap['svg/enemy.svg'],e.x,e.y);
+      self.placeObjectOnGrid(self.imageMap['svg/enemy.svg'],e.x,e.y);
     });
 
 
-    self.placeObjectOnGrid(imageMap['svg/ship.svg'],self.ship.x,self.ship.y);
+    self.placeObjectOnGrid(self.imageMap['svg/ship.svg'],self.ship.x,self.ship.y);
 
     if (trekGameScene.mouseGrid.x != -1) {
-      self.placeObjectOnGrid(imageMap['svg/cursor.svg'],trekGameScene.mouseGrid.x,trekGameScene.mouseGrid.y);
+      self.placeObjectOnGrid(self.imageMap['svg/cursor.svg'],self.mouseGrid.x,self.mouseGrid.y);
     }
 
     self.torpedoes.forEach(function(t){
-      self.placeObjectOnGrid(imageMap['svg/torpedo.svg'],t.points[0].x,t.points[0].y);
+      self.placeObjectOnGrid(self.imageMap['svg/torpedo.svg'],t.points[0].x,t.points[0].y);
     });
 
     var canvas = document.getElementById('scanner');
@@ -77,7 +82,7 @@ var trekGameScene = {
     });
 
     if (this.lockCursor) {
-      this.placeObjectOnGrid(imageMap['svg/lockCursor.svg'],this.lockCursor.x,this.lockCursor.y);
+      this.placeObjectOnGrid(this.imageMap['svg/lockCursor.svg'],this.lockCursor.x,this.lockCursor.y);
     }
   },
 
@@ -139,7 +144,7 @@ var trekGameScene = {
     if (this.ship.torpedoes > 0) {
       if (this.lockCursor) {
         this.ship.torpedoes -= 1;
-        this.fireTorpedoCoords(this.ship.x,this.ship.y,this.lockCursor.x,this.lockCursor.y,torpedoInterval);
+        this.fireTorpedoCoords(this.ship.x,this.ship.y,this.lockCursor.x,this.lockCursor.y,this.torpedoInterval);
       }
     }
     btn.blur();
@@ -159,8 +164,8 @@ var trekGameScene = {
         if (this.coordOccupied(points[points.length-1].x,points[points.length-1].y)){
           points = points.slice(0,points.length-1);
         }
-        course = this.clipCourse(points);
-        travelBaseTime = new Date().getTime();
+        this.course = this.clipCourse(points);
+        this.travelBaseTime = new Date().getTime();
       }
     }
   },
@@ -232,10 +237,7 @@ var trekGameScene = {
     }
 
     var loc = this.findFreeSpot();
-    this.ship = {x:loc[0],y:loc[1]};
-    this.ship.torpedoes = 9;
-    this.ship.energy = 999;
-    this.ship.shields = 100;
+    this.ship = {x:loc[0],y:loc[1],torpedoes:9,energy:999,shields:100};
 
     this.redrawScene();
   },
@@ -249,7 +251,7 @@ var trekGameScene = {
         baseTime:new Date().getTime(),
         duration:duration,
         target:target.object,
-        energy:phaserEnergy});
+        energy:trekGameModel.phaserEnergy});
       }
     },
 
@@ -359,12 +361,12 @@ var trekGameScene = {
     wantRedraw = wantRedraw || self.phasers.length > 0;
 
 
-    if (course.length > 0 && time-travelBaseTime > 500) {
-      travelBaseTime = time;
-      self.ship.x = course[0].x;
-      self.ship.y = course[0].y;
-      course = course.splice(1,course.length);
-      if (course.length == 0) {
+    if (this.course.length > 0 && time-this.travelBaseTime > 500) {
+      this.travelBaseTime = time;
+      self.ship.x = this.course[0].x;
+      self.ship.y = this.course[0].y;
+      this.course = this.course.splice(1,this.course.length);
+      if (this.course.length == 0) {
         this.lockCursor = null;
       }
       wantRedraw = true;

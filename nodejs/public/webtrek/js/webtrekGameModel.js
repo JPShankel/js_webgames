@@ -89,6 +89,7 @@ TrekQuadrant.prototype.createObjectAt = function(qx,qy,sx,sy,type) {
 var trekGameModel = {
   shipPosition: new TrekPosition(0,0,0,0),
   quadrantData: [],
+  phaserEnergy:100,
 
   init: function() {
     for (var i=0;i<8;++i) {

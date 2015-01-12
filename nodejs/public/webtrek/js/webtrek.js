@@ -24,9 +24,6 @@ $(document).ready(function() {
 
   scanner.addEventListener('mouseup',function(e){
     gameStateManager.onMouseUp(e);
-	  if (trekGameScene.mouseGrid.x != -1) {
-	  		trekGameScene.lockCursor = trekGameScene.mouseGrid;
-  	}
   });
 
 
@@ -40,27 +37,16 @@ $(document).ready(function() {
 
   async.each(images,trekGameScene.loadImage,function(err){
     trekGameModel.init();
-    trekGameModel.generate(200+Math.floor(Math.random()*247),8,20);
-    trekGameScene.loadQuadrant(0,0);
     gameStateManager.setState(mainMenuState);
     setInterval(frameTimer,10);
 
   });
 
-
 });
-
-var imageMap = {};
-var course = [];
-var travelBaseTime = 0;
-var phaserEnergy = 100;
-
-var torpedoInterval = 200;
 
 function frameTimer() {
   gameStateManager.onFrameUpdate();
 }
-
 
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
