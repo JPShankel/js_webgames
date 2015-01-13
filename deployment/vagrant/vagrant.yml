@@ -47,6 +47,8 @@
 
   - include: ag.yml
 
+  - include: mongodb.yaml
+
   - name: install supervisor
     apt: pkg=supervisor
 

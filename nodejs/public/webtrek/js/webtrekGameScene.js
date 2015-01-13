@@ -109,6 +109,19 @@ var trekGameScene = {
     }
   },
 
+  drawLongRange: function() {
+    var canvas =document.getElementById("scanner");
+    var context =canvas.getContext("2d");
+    this.drawGrid();
+    for (var i=0;i<8;++i) {
+      for (var j=0;j<8;++j) {
+        var px = (i*canvas.width)/8;
+        var py = (j*canvas.height)/8;
+        context.fillText("HI",px,py);
+      }
+    }
+  },
+
   clipCourse: function(points) {
     var ret = [];
     for (var p=0;p<points.length;p++) {

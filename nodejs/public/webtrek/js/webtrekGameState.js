@@ -41,8 +41,11 @@ TrekGameState.prototype.onMouseUp = function(e) {
 }
 
 TrekGameState.prototype.onMouseDown = function(e) {
-
 }
+
+TrekGameState.prototype.onMouseMove = function(e) {
+}
+
 /*
 * NewGameState - app state handler for starting a new game
 */
@@ -279,4 +282,12 @@ var gameStateManager = {
     this.popState();
   }
 
+}
+
+function longRange() {
+  gameStateManager.setState(longRangeState);
+}
+
+function shortRange() {
+  gameStateManager.setState(shortRangeState);
 }
